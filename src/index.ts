@@ -1,19 +1,21 @@
 import { Assignment } from "midi-mixer-plugin";
 
-const foo = new Assignment("foo", {
-  name: "Foo",
-  mute: true,
+const example = new Assignment("foo", {
+  name: "Example Plugin Entry",
 });
 
-const bar = new Assignment("bar", {
-  name: "Bar",
+example.on("volumeChanged", (level: number) => {
+  example.volume = level;
 });
 
-const timeout = setInterval(() => {
-  foo.setVolume(Math.random());
-  bar.setVolume(Math.random());
-}, 1000);
+example.on("mutePressed", () => {
+  example.muted = !example.muted;
+});
 
-$MM.onClose(() => {
-  clearTimeout(timeout);
+example.on("assignPressed", () => {
+  example.assigned = !example.assigned;
+});
+
+example.on("runPressed", () => {
+  example.running = !example.running;
 });
