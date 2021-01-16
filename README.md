@@ -1,0 +1,1 @@
+# MIDI Mixer Template Plugin
