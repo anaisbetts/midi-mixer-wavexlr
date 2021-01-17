@@ -16,3 +16,7 @@ npm build
 ```
 
 To ensure that the created plugin is easy to use for other users, make sure to commit your `dist` folder with any changes so that it can be downloaded and placed directly in to the `plugins` folder with no build step for the user.
+
+## API
+
+See [jpwilliams/midi-mixer-plugin](https://github.com/jpwilliams/midi-mixer-plugin) for API documentation.
