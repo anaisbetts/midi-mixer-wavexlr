@@ -19,4 +19,4 @@ To ensure that the created plugin is easy to use for other users, make sure to c
 
 ## API
 
-See [jpwilliams/midi-mixer-plugin](https://github.com/jpwilliams/midi-mixer-plugin) for API documentation.
+See [midi-mixer-plugin](https://github.com/midi-mixer/midi-mixer-plugin) for API documentation.
