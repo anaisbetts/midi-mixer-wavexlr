@@ -1,6 +1,6 @@
 # MIDI Mixer Template Plugin
 
-Use this template to quickly create a plugin for MIDI Mixer. It uses [TypeScript](https://www.typescriptlang.org/), [Parcel](https://parceljs.org/), and [jpwilliams/midi-mixer-plugin](https://github.com/jpwilliams/midi-mixer-plugin) to provide an easy API and development environment with hot-loading built in!
+Use this template to quickly create a plugin for MIDI Mixer. It uses [TypeScript](https://www.typescriptlang.org/), [Parcel](https://parceljs.org/), and [midi-mixer-plugin](https://github.com/midi-mixer/midi-mixer-plugin) to provide an easy API and development environment with hot-loading built in!
 
 ## Usage
 
