@@ -6,6 +6,12 @@ Use this template to quickly create a plugin for MIDI Mixer. It uses [TypeScript
 
 - Create a repository using this as a template
 - Clone your repository in to `%appdata%/midi-mixer-app/plugins`
+- Install Node (I'd recommend [Volta](https://volta.sh/))
+
+``` bash
+# install dependencies
+npm ci
+```
 
 ``` bash
 # start dev environment
