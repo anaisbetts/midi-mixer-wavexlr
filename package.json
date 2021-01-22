@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel src/index.ts --hmr-hostname localhost",
-    "build": "parcel build src/index.ts"
+    "dev": "parcel src/index.ts --hmr-hostname localhost --public-url . -t browser",
+    "build": "parcel build src/index.ts --public-url . -t browser"
   },
   "settings": {
     "address": "localhost:4444",
