@@ -18,7 +18,7 @@ npm ci
 npm run dev
 
 # production build
-npm build
+npm run build
 ```
 
 To ensure that the created plugin is easy to use for other users, make sure to commit your `dist` folder with any changes so that it can be downloaded and placed directly in to the `plugins` folder with no build step for the user.
