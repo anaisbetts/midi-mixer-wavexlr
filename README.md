@@ -15,7 +15,7 @@ npm ci
 
 ``` bash
 # start dev environment
-npm run dev
+npm start
 
 # production build
 npm run build
