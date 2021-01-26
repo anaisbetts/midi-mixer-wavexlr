@@ -10,12 +10,15 @@
     "build": "tsc && parcel build src/index.ts --public-url . -t browser"
   },
   "settings": {
-    "address": "localhost:4444",
-    "password": "",
-    "multi": {
-      "brown": "Brown",
-      "blue": "Blue",
-      "purple": "Purple"
+    "url": {
+      "label": "URL",
+      "required": true,
+      "type": "text"
+    },
+    "password": {
+      "label": "Password",
+      "required": true,
+      "type": "password"
     }
   },
   "author": "Jack Williams",
