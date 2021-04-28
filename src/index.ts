@@ -1,3 +1,4 @@
+// public
 import { Assignment, ButtonType } from "midi-mixer-plugin";
 
 /**
@@ -39,4 +40,22 @@ const typeExample = new ButtonType("bar", {
 
 typeExample.on("pressed", () => {
   typeExample.active = !typeExample.active;
+});
+
+/**
+ * Example of uses buttons and statuses to show the status of the plugin
+ * on the settings page.
+ *
+ * We use the keys defined in the `settings` object of our `package.json` in
+ * order to react to UI button presses and set resulting statuses.
+ *
+ * Using this is great for showing anything from "Connected" statuses to error
+ * messages to your end users.
+ */
+$MM.onSettingsButtonPress("run", () => {
+  $MM.setSettingsStatus("status", "Running...");
+
+  setTimeout(() => {
+    $MM.setSettingsStatus("status", "Done");
+  }, 1000);
 });

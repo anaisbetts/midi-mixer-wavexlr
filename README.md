@@ -1,4 +1,4 @@
-# MIDI Mixer Template Plugin
+# MIDI Mixer Template Plugin (Parcel)
 
 Use this template to quickly create a plugin for MIDI Mixer. It uses [TypeScript](https://www.typescriptlang.org/), [Parcel](https://parceljs.org/), and [midi-mixer-plugin](https://github.com/midi-mixer/midi-mixer-plugin) to provide an easy API and development environment with hot-loading built in!
 
@@ -10,7 +10,7 @@ Use this template to quickly create a plugin for MIDI Mixer. It uses [TypeScript
 
 ``` bash
 # install dependencies
-npm ci
+npm install
 ```
 
 ``` bash
@@ -36,4 +36,4 @@ A few key items are configurable in your plugin's `package.json`.
 - `version`: The version of the plugin in the MM UI
 - `author`: Your name in the MM UI
 - `main`: Must point to the built entry file for your plugin
-- `settings`: An object of settings that will appear in the MM UI's Settings page for the plugin - see the [definition](https://github.com/midi-mixer/plugin-template/blob/main/package.json#L12-L23) and [fetching](https://github.com/midi-mixer/plugin-template/blob/main/src/index.ts#L3-L8)
+- `settings`: An object of settings that will appear in the MM UI's Settings page for the plugin - see the [definition](https://github.com/midi-mixer/plugin-template-parcel/blob/main/package.json#L14-L34) and [fetching](https://github.com/midi-mixer/plugin-template-parcel/blob/main/src/index.ts#L4-L9)

@@ -1,8 +1,8 @@
 {
-  "name": "midi-mixer-plugin-template",
-  "prettyName": "Template Plugin",
+  "name": "plugin-template-parcel",
+  "prettyName": "Template Plugin (Parcel)",
   "version": "0.1.0",
-  "description": "A template plugin for MIDI Mixer.",
+  "description": "A template plugin for MIDI Mixer using the Parcel bundler.",
   "main": "dist/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,6 +21,15 @@
       "label": "Password",
       "required": true,
       "type": "password"
+    },
+    "status": {
+      "label": "Status",
+      "type": "status",
+      "fallback": "Not running"
+    },
+    "run": {
+      "label": "Run",
+      "type": "button"
     }
   },
   "author": "Jack Williams",
