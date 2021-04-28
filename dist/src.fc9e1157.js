@@ -9,4 +9,4 @@ parcelRequire=function(e,r,t,n){var i,o="function"==typeof parcelRequire&&parcel
 },{"./Assignment":"JVd7","./ButtonType":"fk5p"}],"QCba":[function(require,module,exports) {
 "use strict";var n=require("midi-mixer-plugin");$MM.getSettings().then(function(n){console.log("settings:",n)});var e=new n.Assignment("foo",{name:"Example Plugin Entry"});e.on("volumeChanged",function(n){e.volume=n}),e.on("mutePressed",function(){e.muted=!e.muted}),e.on("assignPressed",function(){e.assigned=!e.assigned}),e.on("runPressed",function(){e.running=!e.running});var t=new n.ButtonType("bar",{name:"Example Button Type"});t.on("pressed",function(){t.active=!t.active});
 },{"midi-mixer-plugin":"pOiF"}]},{},["QCba"], null)
-//# sourceMappingURL=dist/src.fc9e1157.js.map
+//# sourceMappingURL=src.fc9e1157.js.map
