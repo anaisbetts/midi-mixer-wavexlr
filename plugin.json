@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/midi-mixer-plugin/plugin.schema.json",
+  "version": "1.0.0",
+  "id": "com.midi-mixer.template",
+  "name": "Template",
+  "main": "dist/index.html",
+  "dev": "http://localhost:3000",
+  "remote": "https://plugins.template.midi-mixer.com",
+  "settings": {
+    "url": {
+      "label": "URL",
+      "required": true,
+      "type": "text"
+    },
+    "password": {
+      "label": "Password",
+      "required": true,
+      "type": "password"
+    },
+    "status": {
+      "label": "Status",
+      "type": "status",
+      "fallback": "Not running"
+    },
+    "run": {
+      "label": "Run",
+      "type": "button"
+    }
+  },
+  "author": "Jack Williams"
+}

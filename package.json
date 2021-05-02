@@ -1,36 +1,11 @@
 {
-  "name": "plugin-template-parcel",
-  "prettyName": "Template Plugin (Parcel)",
-  "version": "0.1.0",
-  "description": "A template plugin for MIDI Mixer using the Parcel bundler.",
-  "main": "dist/index.html",
+  "name": "plugin-template",
+  "version": "1.0.0",
+  "description": "A template plugin for MIDI Mixer.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rimraf dist",
-    "prestart": "npm run clean",
-    "start": "parcel src/index.html --hmr-hostname localhost --public-url ./ -t browser",
-    "build": "tsc && npm run clean && parcel build src/index.html --public-url ./ -t browser"
-  },
-  "settings": {
-    "url": {
-      "label": "URL",
-      "required": true,
-      "type": "text"
-    },
-    "password": {
-      "label": "Password",
-      "required": true,
-      "type": "password"
-    },
-    "status": {
-      "label": "Status",
-      "type": "status",
-      "fallback": "Not running"
-    },
-    "run": {
-      "label": "Run",
-      "type": "button"
-    }
+    "dev": "vite",
+    "build": "tsc && vite build && workbox generateSW workbox-config.js",
+    "serve": "vite preview"
   },
   "author": "Jack Williams",
   "license": "ISC",
@@ -41,13 +16,14 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.3.1",
-    "parcel-bundler": "^1.12.4",
     "prettier": "^2.2.1",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.1.3"
+    "rollup-plugin-copy": "^3.4.0",
+    "typescript": "^4.2.4",
+    "vite": "^2.2.3",
+    "workbox-cli": "^6.1.5"
   },
   "dependencies": {
-    "midi-mixer-plugin": "^0.1.7"
+    "midi-mixer-plugin": "^0.2.0"
   },
   "volta": {
     "node": "14.15.4",
