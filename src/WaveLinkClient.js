@@ -46,31 +46,32 @@ class WaveLinkClient {
   }
 
   tryToConnect() {
-    if (this.appIsRunning) {
-      debug("Trying to connect to port: " + this.port)
-      this.websocket = new WebSocket("ws://" + this.host + ":" + this.port)
-      this.websocket.rpc = this.rpc
+    debug("Trying to connect to port: " + this.port)
+    this.websocket = new WebSocket("ws://" + this.host + ":" + this.port)
+    this.websocket.rpc = this.rpc
 
-      this.websocket.onopen = () => {
-        debug("Connection established")
-        setTimeout(() => this.initRPC(), 200)
+    this.websocket.onmessage = function (evt) {
+      if (typeof evt.data === "string") {
+        debug("Incoming Message", JSON.parse(evt.data))
+      } else {
+        debug("Incoming Message", typeof evt.data, evt.data)
       }
 
-      this.websocket.onerror = () => {
-        debug("Connection Error")
-        setTimeout(() => this.reconnect(), 100)
-      }
-
-      this.websocket.onmessage = function (evt) {
-        if (typeof evt.data === "string") {
-          debug("Incoming Message", JSON.parse(evt.data))
-        } else {
-          debug("Incoming Message", typeof evt.data, evt.data)
-        }
-
-        this.rpc.messageHandler(evt.data)
-      }
+      this.rpc.messageHandler(evt.data)
     }
+
+    return new Promise((res, rej) => {
+      this.websocket.onopen = async () => {
+        debug("Connection established")
+        await this.initRPC()
+      }
+
+      this.websocket.onerror = (e) => {
+        debug("Connection Error")
+        this.reconnect()
+        rej(e)
+      }
+    })
   }
 
   initRPC() {
@@ -224,7 +225,8 @@ class WaveLinkClient {
     this.rpc.on("channelsChanged", ["channels"], (channels) => {
       this.setChannels(channels)
     })
-    this.getApplicationInfo()
+
+    return this.getApplicationInfo()
   }
 
   // Method for preventing spamming "volumeChanged" and updateKey() delay
@@ -448,8 +450,12 @@ class WaveLinkClient {
 
     var isNotBlocked =
       mixerTyp == "input"
-        ? slider == "local" ? mixer.isNotBlockedLocal : mixer.isNotBlockedStream
-        : slider == "local" ? this.output.isNotBlockedLocal : this.output.isNotBlockedStream
+        ? slider == "local"
+          ? mixer.isNotBlockedLocal
+          : mixer.isNotBlockedStream
+        : slider == "local"
+        ? this.output.isNotBlockedLocal
+        : this.output.isNotBlockedStream
 
     if (isNotBlocked) {
       var intervalTimer = setInterval(() => {
@@ -596,7 +602,7 @@ class WaveLinkClient {
   // Request
 
   getApplicationInfo() {
-    this.rpc.call("getApplicationInfo").then((result) => {
+    return this.rpc.call("getApplicationInfo").then((result) => {
       if (result || result == undefined) {
         if (result["appName"] == "Elgato Wave Link") {
           debug("Wave Link WebSocketServer found.")
@@ -627,12 +633,6 @@ class WaveLinkClient {
         }
       }
     })
-
-    setTimeout(() => {
-      if (!this.isConnected && this.isWLUpToDate) {
-        this.reconnect()
-      }
-    }, 200)
   }
 
   getMixers() {
@@ -803,7 +803,6 @@ class WaveLinkClient {
     } else {
       this.port = this.startPort
     }
-    this.tryToConnect()
   }
 
   // Taken from common.js (Control Center), adjusted to fit
@@ -884,6 +883,10 @@ class WaveLinkClient {
 //NB: Stub out this class
 class AppWaveLink {
   updatePI() {}
+}
+
+function delay(ms) {
+  return new Promise((res) => setTimeout(res, ms))
 }
 
 var debug = console.log.bind(console)
