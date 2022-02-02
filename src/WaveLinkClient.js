@@ -257,11 +257,13 @@ class WaveLinkClient {
   }
 
   setMonitorMixOutput(mixOutput) {
-    this.rpc
+    return this.rpc
       .call("setMonitorMixOutput", { monitorMix: mixOutput })
       .then((result) => {
         this.selectedMonitorMix = result["monitorMix"]
         this.emit("monitorMixChanged")
+
+        return this.selectedMonitorMix
       })
   }
 
@@ -270,10 +272,14 @@ class WaveLinkClient {
   }
 
   changeSwitchState(state) {
-    this.rpc.call("switchMonitoring", { switchState: state }).then((result) => {
-      this.switchState = result["switchState"]
-      this.emit("switchStateChanged")
-    })
+    return this.rpc
+      .call("switchMonitoring", { switchState: state })
+      .then((result) => {
+        this.switchState = result["switchState"]
+        this.emit("switchStateChanged")
+
+        return this.switchState
+      })
   }
 
   adjustMicGain(vol) {
@@ -323,7 +329,7 @@ class WaveLinkClient {
   }
 
   setMicSettings() {
-    this.rpc
+    return this.rpc
       .call("setMicrophoneSettings", {
         microphoneGain: this.micSettings.microphoneGain,
         microphoneOutputVolume: this.micSettings.microphoneOutputVolume,
@@ -340,6 +346,8 @@ class WaveLinkClient {
         this.micSettings.isMicrophoneClipguardOn =
           result["isMicrophoneClipguardOn"]
         this.emit("micSettingsChanged")
+
+        return this.micSettings
       })
   }
 
@@ -549,36 +557,39 @@ class WaveLinkClient {
   }
 
   setInputMixer(mixId, slider) {
-    this.mixers.forEach((mixer) => {
-      if (mixer.mixerId == mixId) {
-        this.rpc
-          .call("setInputMixer", {
-            mixId: mixer.mixerId,
-            slider: slider,
-            isLinked: mixer.isLinked,
-            localVolumeIn: mixer.localVolIn,
-            isLocalInMuted: mixer.isLocalMuteIn,
-            streamVolumeIn: mixer.streamVolIn,
-            isStreamInMuted: mixer.isStreamMuteIn,
-            filters: mixer.filters,
-            localMixFilterBypass: mixer.localMixFilterBypass,
-            streamMixFilterBypass: mixer.streamMixFilterBypass,
-          })
-          .then((result) => {
-            mixer.isAvailable = result["isAvailable"]
-            mixer.isLinked = result["isLinked"]
-            mixer.deltaLinked = result["deltaLinked"]
-            mixer.localVolIn = result["localVolumeIn"]
-            mixer.isLocalMuteIn = result["isLocalInMuted"]
-            mixer.streamVolIn = result["streamVolumeIn"]
-            mixer.isStreamMuteIn = result["isStreamInMuted"]
-            mixer.localMixFilterBypass = result["localMixFilterBypass"]
-            mixer.streamMixFilterBypass = result["streamMixFilterBypass"]
-            mixer.filters = result["filters"]
-            this.emit("inputMixerChanged", mixer.mixerId)
-          })
-      }
-    })
+    const mixer = this.mixers.find((x) => x.mixerId == mixId)
+    if (!mixer) {
+      return Promise.reject(new Error("Mixer not found"))
+    }
+
+    return this.rpc
+      .call("setInputMixer", {
+        mixId: mixer.mixerId,
+        slider: slider,
+        isLinked: mixer.isLinked,
+        localVolumeIn: mixer.localVolIn,
+        isLocalInMuted: mixer.isLocalMuteIn,
+        streamVolumeIn: mixer.streamVolIn,
+        isStreamInMuted: mixer.isStreamMuteIn,
+        filters: mixer.filters,
+        localMixFilterBypass: mixer.localMixFilterBypass,
+        streamMixFilterBypass: mixer.streamMixFilterBypass,
+      })
+      .then((result) => {
+        mixer.isAvailable = result["isAvailable"]
+        mixer.isLinked = result["isLinked"]
+        mixer.deltaLinked = result["deltaLinked"]
+        mixer.localVolIn = result["localVolumeIn"]
+        mixer.isLocalMuteIn = result["isLocalInMuted"]
+        mixer.streamVolIn = result["streamVolumeIn"]
+        mixer.isStreamMuteIn = result["isStreamInMuted"]
+        mixer.localMixFilterBypass = result["localMixFilterBypass"]
+        mixer.streamMixFilterBypass = result["streamMixFilterBypass"]
+        mixer.filters = result["filters"]
+        this.emit("inputMixerChanged", mixer.mixerId)
+
+        return mixer
+      })
   }
 
   setOutputMixer() {
@@ -587,7 +598,7 @@ class WaveLinkClient {
       streamVol = this.output.streamVolOut,
       streamMute = this.output.isStreamMuteOut
 
-    this.rpc
+    return this.rpc
       .call("setOutputMixer", {
         localVolumeOut: localVol,
         isLocalOutMuted: localMute,
@@ -600,6 +611,8 @@ class WaveLinkClient {
         this.output.streamVolOut = result["streamVolumeOut"]
         this.output.isStreamMuteOut = result["isStreamOutMuted"]
         this.emit("outputMixerChanged")
+
+        return this.output
       })
   }
 
@@ -626,33 +639,38 @@ class WaveLinkClient {
             this.getMixers()
             this.isConnected = true
             this.isWLUpToDate = true
+            return true
           } else {
             debug("Please update WL-Version")
             this.isConnected = true
             this.isWLUpToDate = false
             this.awl.updatePI()
+            return Promise.reject(new Error("Please update WL-Version"))
           }
         } else {
           debug("Wrong WebSocketServer found.")
+          return Promise.reject(new Error("Wrong WebSocketServer found."))
         }
       }
     })
   }
 
   getMixers() {
-    this.rpc.call("getAllChannelInfo").then((result) => {
+    return this.rpc.call("getAllChannelInfo").then((result) => {
       this.setChannels(result)
+      return result
     })
   }
 
   getMicrophoneState() {
-    this.rpc.call("getMicrophoneState").then((result) => {
+    return this.rpc.call("getMicrophoneState").then((result) => {
       this.isMicrophoneConnected = result["isMicrophoneConnected"]
+      return this.isMicrophoneConnected
     })
   }
 
   getMicrophoneSettings() {
-    this.rpc.call("getMicrophoneSettings").then((result) => {
+    return this.rpc.call("getMicrophoneSettings").then((result) => {
       var mic = {
         microphoneGain: result["microphoneGain"],
         microphoneOutputVolume: result["microphoneOutputVolume"],
@@ -662,11 +680,13 @@ class WaveLinkClient {
       }
       this.micSettings = mic
       //this.emit('setKeyIcons');
+
+      return mic
     })
   }
 
   getMonitoringState() {
-    this.rpc.call("getMonitoringState").then((result) => {
+    return this.rpc.call("getMonitoringState").then((result) => {
       this.output = {
         localVolOut: result["localVolumeOut"],
         streamVolOut: result["streamVolumeOut"],
@@ -677,11 +697,13 @@ class WaveLinkClient {
         isNotBlockedStream: true,
       }
       //this.emit("setKeyIcons");
+
+      return this.output
     })
   }
 
   getMonitorMixOutputList() {
-    this.rpc.call("getMonitorMixOutputList").then((result) => {
+    return this.rpc.call("getMonitorMixOutputList").then((result) => {
       this.localOutputList = Object.values(result["monitorMixList"]).map(
         (e) => {
           var out = {
@@ -694,12 +716,18 @@ class WaveLinkClient {
       )
 
       this.selectedMonitorMix = result["monitorMix"]
+
+      return {
+        selectedMonitorMix: this.selectedMonitorMix,
+        monitorMixList: this.localOutputList,
+      }
     })
   }
 
   getSwitchState() {
-    this.rpc.call("getSwitchState").then((result) => {
+    return this.rpc.call("getSwitchState").then((result) => {
       this.switchState = result["switchState"]
+      return this.switchState
     })
   }
 
