@@ -74,6 +74,10 @@ class WaveLinkClient {
     })
   }
 
+  disconnect() {
+    this.websocket.close()
+  }
+
   initRPC() {
     this.rpc.toStream = (msg) => {
       try {
