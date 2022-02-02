@@ -14,7 +14,8 @@
     "outDir": "dist",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "typeRoots": ["node_modules/@types", "./node_modules/midi-mixer-plugin/lib"]
   },
-  "include": ["./src", "./node_modules/midi-mixer-plugin/lib"]
+  "include": ["./src"]
 }
