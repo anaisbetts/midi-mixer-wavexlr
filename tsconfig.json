@@ -16,5 +16,5 @@
     "noUnusedParameters": false,
     "noImplicitReturns": true
   },
-  "include": ["./src"]
+  "include": ["./src", "./node_modules/midi-mixer-plugin/lib"]
 }
