@@ -1,9 +1,9 @@
 {
   "$schema": "./node_modules/midi-mixer-plugin/plugin.schema.json",
-  "id": "plugin-template",
+  "id": "midi-mixer-wave-xlr",
   "name": "Wave XLR",
   "type": "node",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "Ani Betts",
   "main": "dist/main.js",
   "settings": {}

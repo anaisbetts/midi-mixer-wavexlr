@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A MIDI Mixer plugin for the Wave XLR",
   "scripts": {
-    "build": "tsc && midi-mixer pack"
+    "build": "git clean -xdf dist && tsc && midi-mixer pack"
   },
   "author": "Jack Williams",
   "license": "ISC",
