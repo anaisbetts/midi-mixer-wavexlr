@@ -2,8 +2,6 @@ import { Assignment, ButtonType } from "midi-mixer-plugin"
 import WaveLinkClient from "./WaveLinkClient"
 import WebSocket from "ws"
 
-console.log(Assignment)
-
 // Give node.js Websocket superpowers
 const wnd = globalThis as any
 wnd.WebSocket = WebSocket
