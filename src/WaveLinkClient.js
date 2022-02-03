@@ -63,7 +63,7 @@ class WaveLinkClient {
     return new Promise((res, rej) => {
       this.websocket.onopen = async () => {
         debug("Connection established")
-        await this.initRPC()
+        await this.initRPC().then((x) => res(x))
       }
 
       this.websocket.onerror = (e) => {
@@ -652,6 +652,8 @@ class WaveLinkClient {
           return Promise.reject(new Error("Wrong WebSocketServer found."))
         }
       }
+
+      return false
     })
   }
 
