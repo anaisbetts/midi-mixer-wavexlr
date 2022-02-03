@@ -1,11 +1,10 @@
 {
   "$schema": "./node_modules/midi-mixer-plugin/plugin.schema.json",
-  "version": "0.0.1",
-  "id": "org.anaisbetts.wavexlr",
+  "id": "plugin-template",
   "name": "Wave XLR",
-  "main": "dist/main.js",
   "type": "node",
-  "remote": "https://plugins.template.midi-mixer.com",
-  "settings": {},
-  "author": "Ani Betts"
+  "version": "1.0.0",
+  "author": "Ani Betts",
+  "main": "dist/main.js",
+  "settings": {}
 }
