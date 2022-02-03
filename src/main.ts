@@ -73,15 +73,26 @@ async function initialize() {
       mixerTypes.forEach((type) => {
         const name = `${mixer.mixId}_${type}`
         const friendlyType = type === "local" ? "Headphone" : "Stream"
+        const isLocal = type === "local"
 
-        acc[name] = {
-          mixer,
-          assignment: new Assignment(name, {
-            name: `${mixer.mixerName} - ${friendlyType}`,
-            volume:
-              type === "local" ? mixer.localVolumeIn : mixer.streamVolumeIn,
-          }),
-        }
+        const assign = new Assignment(name, {
+          name: `${mixer.mixerName} - ${friendlyType}`,
+          muted: isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted,
+          volume: isLocal ? mixer.localVolumeIn : mixer.streamVolumeIn,
+        })
+
+        assign.on("volumeChanged", (level: number) => {
+          const l = Math.round(level * 100)
+          client.setVolume("input", mixer.mixId, type, l)
+          assign.volume = level
+        })
+
+        assign.on("mutePressed", () => {
+          client.setMute("input", mixer.mixId, type)
+          assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
+        })
+
+        acc[name] = { mixer, assignment: assign }
       })
 
       return acc

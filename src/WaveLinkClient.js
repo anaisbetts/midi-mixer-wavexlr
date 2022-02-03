@@ -520,11 +520,11 @@ class WaveLinkClient {
           if (mixerTyp == "input") {
             mixer.localVolIn = localVol
             mixer.streamVolIn = streamVol
-            this.setInputMixer(mixerId, slider)
+            return this.setInputMixer(mixerId, slider)
           } else if (mixerTyp == "output") {
             this.output.localVolOut = localVol
             this.output.streamVolOut = streamVol
-            this.setOutputMixer()
+            return this.setOutputMixer()
           }
         }
       }, this.fadingDelay)
