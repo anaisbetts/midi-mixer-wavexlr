@@ -9,7 +9,11 @@ npm install
 npm run build
 ```
 
-## To run locally (Windows)
+## How do I use this??
+
+Go to the Releases on the sidebar and download the latest release, then double-click it. MIDI Mixer will install it, and you can activate it in the Plugins section of the app.
+
+## To run locally for debugging (Windows)
 
 Initial setup:
 
