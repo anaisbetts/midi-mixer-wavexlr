@@ -2,18 +2,20 @@
 
 This plugin allows you, along with MIDI Mixer, to control your Wave Link app via MIDI. Currently supports faders only.
 
-## To build
+## How do I use this??
+
+Go to the Releases on the sidebar and download the latest release, then double-click it. MIDI Mixer will install it, and you can activate it in the Plugins section of the app.
+
+## For Developers:
+
+### To build
 
 ```sh
 npm install
 npm run build
 ```
 
-## How do I use this??
-
-Go to the Releases on the sidebar and download the latest release, then double-click it. MIDI Mixer will install it, and you can activate it in the Plugins section of the app.
-
-## To run locally for debugging (Windows)
+### To run locally for debugging (Windows)
 
 Initial setup:
 
