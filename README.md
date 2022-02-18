@@ -1,6 +1,6 @@
 # MIDI Mixer + Wave XLR
 
-This plugin allows you, along with MIDI Mixer, to control your Wave XLR device via MIDI. Currently supports faders only.
+This plugin allows you, along with MIDI Mixer, to control your Wave Link app via MIDI. Currently supports faders only.
 
 ## To build
 
