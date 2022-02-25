@@ -63,6 +63,10 @@ const mixerTypes = ["local", "stream"]
 async function initialize() {
   const client = new WaveLinkClient("windows")
 
+  // Leak client for debugging
+  const wnd: any = globalThis
+  wnd.waveLinkClient = client
+
   try {
     await connectWithRetry(client)
   } catch (e) {
