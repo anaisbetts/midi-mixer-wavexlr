@@ -110,6 +110,9 @@ async function initialize() {
           assign.volume = level
         })
 
+        // TODO: Update assign.volume when the mixer volume changes
+        // TODO: Update mute when the mixer mute changes
+
         assign.on("mutePressed", () => {
           client.setMute("input", mixer.mixId, type)
           assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
