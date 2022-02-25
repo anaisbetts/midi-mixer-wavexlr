@@ -3,7 +3,7 @@
   "id": "midi-mixer-wave-xlr",
   "name": "Wave XLR",
   "type": "node",
-  "version": "0.1.1",
+  "version": "0.5.0",
   "author": "Ani Betts",
   "main": "dist/main.js",
   "settings": {}
