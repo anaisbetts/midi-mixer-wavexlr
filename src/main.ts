@@ -129,6 +129,23 @@ async function initialize() {
     {}
   )
 
+  // Monitor mixer level changes and update the faders
+  // deviceId example: pcm_out_01_v_00_sd2
+  // mixerId examples: pcm_out_01_v_00_sd2_local, pcm_out_01_v_00_sd2_stream
+  client.on!((event: string, deviceId: string) => {
+    if (event !== "inputMixerChanged ") return
+
+    const mixer: Mixer = client.getMixer(deviceId)
+
+    const streamMixer = mixerMap[`${deviceId}_stream`]
+    const localMixer = mixerMap[`${deviceId}_local`]
+
+    localMixer.assignment.muted = mixer.isLocalInMuted
+    localMixer.assignment.volume = volumeWaveLinkToMM(mixer.localVolumeIn)
+    streamMixer.assignment.muted = mixer.isStreamInMuted
+    streamMixer.assignment.volume = volumeWaveLinkToMM(mixer.streamVolumeIn)
+  })
+
   // Set up toggle buttons
   const createButton = (
     id: string,
