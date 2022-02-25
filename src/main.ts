@@ -1,4 +1,4 @@
-import { Assignment, ButtonType } from "midi-mixer-plugin"
+import { Assignment, ButtonType, ButtonTypeData } from "midi-mixer-plugin"
 import WaveLinkClient from "./WaveLinkClient"
 import WebSocket from "ws"
 
@@ -60,6 +60,9 @@ function volumeWaveLinkToMM(vol: number) {
 }
 
 const mixerTypes = ["local", "stream"]
+let mixerMap: Record<string, { mixer: Mixer; assignment: Assignment }>
+const buttonList: Record<string, ButtonType> = {}
+
 async function initialize() {
   const client = new WaveLinkClient("windows")
 
@@ -73,7 +76,7 @@ async function initialize() {
     $MM.showNotification(`Couldn't connect to Wave Link software! ${e}`)
   }
 
-  const mixerMap = (await client.getMixers()).reduce(
+  mixerMap = (await client.getMixers()).reduce(
     (
       acc: Record<string, { mixer: Mixer; assignment: Assignment }>,
       mixer: Mixer
@@ -126,13 +129,39 @@ async function initialize() {
     {}
   )
 
+  // Set up toggle buttons
+  const createButton = (
+    id: string,
+    data: ButtonTypeData,
+    pressed: (b: ButtonType) => unknown
+  ) => {
+    const btn = new ButtonType(id, data)
+    btn.on("pressed", () => pressed(btn))
+    buttonList[id] = btn
+  }
+
+  createButton(
+    "toggleMonitorState",
+    {
+      name: "Toggle Monitor Mix / Stream Mix in Headphones",
+      active: (await client.getSwitchState()) === "StreamMix",
+    },
+    async (b) => {
+      const current = await client.getSwitchState()
+      const newState = current === "StreamMix" ? "LocalMix" : "StreamMix"
+
+      await client.changeSwitchState(newState)
+      b.active = newState === "StreamMix"
+    }
+  )
+
   console.log(`Found ${Object.keys(mixerMap).length} mixers`)
   console.log(mixerMap)
 }
 
 initialize().then(() => console.log("started!"))
 
-// NB: Without this, Midi Mixer immediately terminates 
+// NB: Without this, Midi Mixer immediately terminates
 setInterval(() => {
   console.log("")
 }, 1 * 60 * 60 * 1000)
