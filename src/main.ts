@@ -51,6 +51,14 @@ async function connectWithRetry(client: WaveLinkClient) {
   return false
 }
 
+function volumeMMToWaveLink(vol: number) {
+  return Math.round(vol * 100.0)
+}
+
+function volumeWaveLinkToMM(vol: number) {
+  return vol / 100.0
+}
+
 const mixerTypes = ["local", "stream"]
 async function initialize() {
   const client = new WaveLinkClient("windows")
@@ -73,15 +81,28 @@ async function initialize() {
         const friendlyType = type === "local" ? "Headphone" : "Stream"
         const isLocal = type === "local"
 
+        const [muted, volume] = isLocal
+          ? [mixer.isLocalInMuted, mixer.localVolumeIn]
+          : [mixer.isStreamInMuted, mixer.streamVolumeIn]
+
         const assign = new Assignment(name, {
           name: `${mixer.mixerName} - ${friendlyType}`,
-          muted: isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted,
-          volume: isLocal ? mixer.localVolumeIn : mixer.streamVolumeIn,
+          muted,
+          volume: volumeWaveLinkToMM(volume),
         })
 
+        // Set volume even harder
+        setTimeout(() => {
+          assign.volume = volumeWaveLinkToMM(volume)
+        }, 100)
+
         assign.on("volumeChanged", (level: number) => {
-          const l = Math.round(level * 100)
-          client.setVolume("input", mixer.mixId, type, l)
+          client.setVolume(
+            "input",
+            mixer.mixId,
+            type,
+            volumeMMToWaveLink(level)
+          )
           assign.volume = level
         })
 
