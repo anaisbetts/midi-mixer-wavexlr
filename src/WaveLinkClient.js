@@ -25,7 +25,7 @@ class WaveLinkClient {
     this.isKeyUpdated = false
 
     this.event = ELGEvents.eventEmitter()
-    this.on = this.event.on
+    this.on = this.event.on.bind(this.event)
     //this.emit = this.event.emit
     this.emit = (...args) => {
       console.log("emit", ...args)

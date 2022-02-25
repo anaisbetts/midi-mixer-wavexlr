@@ -31,6 +31,37 @@ export interface Filter {
   pluginID: string
 }
 
+// NB: These are not the same as Mixer and I want to :knife:
+export interface MixerFromEvent {
+  channelPos: number
+  mixerId: string
+  name: string
+  inputType: number
+  localVolIn: number
+  streamVolIn: number
+  isLinked: boolean
+  deltaLinked: number
+  isLocalMuteIn: boolean
+  isStreamMuteIn: boolean
+  isAvailable: boolean
+  isNotBlockedLocal: boolean
+  isNotBlockedStream: boolean
+  bgColor: string
+  icon: string
+  iconData: string
+  filters: FilterFromEvent[]
+  localMixFilterBypass: boolean
+  streamMixFilterBypass: boolean
+  topSlider: string
+}
+
+export interface FilterFromEvent {
+  active: boolean
+  filterID: string
+  name: string
+  pluginID: string
+}
+
 async function connectWithRetry(client: WaveLinkClient) {
   // NB: Every retry we move forward one port, 21 retries will
   // cycle the entire list twice
@@ -132,18 +163,16 @@ async function initialize() {
   // Monitor mixer level changes and update the faders
   // deviceId example: pcm_out_01_v_00_sd2
   // mixerId examples: pcm_out_01_v_00_sd2_local, pcm_out_01_v_00_sd2_stream
-  client.on!((event: string, deviceId: string) => {
-    if (event !== "inputMixerChanged ") return
-
-    const mixer: Mixer = client.getMixer(deviceId)
+  client.event!.on("inputMixerChanged", (deviceId: string) => {
+    const mixer: MixerFromEvent = client.getMixer(deviceId)
 
     const streamMixer = mixerMap[`${deviceId}_stream`]
     const localMixer = mixerMap[`${deviceId}_local`]
 
-    localMixer.assignment.muted = mixer.isLocalInMuted
-    localMixer.assignment.volume = volumeWaveLinkToMM(mixer.localVolumeIn)
-    streamMixer.assignment.muted = mixer.isStreamInMuted
-    streamMixer.assignment.volume = volumeWaveLinkToMM(mixer.streamVolumeIn)
+    localMixer.assignment.muted = mixer.isLocalMuteIn
+    localMixer.assignment.volume = volumeWaveLinkToMM(mixer.localVolIn)
+    streamMixer.assignment.muted = mixer.isStreamMuteIn
+    streamMixer.assignment.volume = volumeWaveLinkToMM(mixer.streamVolIn)
   })
 
   // Set up toggle buttons
