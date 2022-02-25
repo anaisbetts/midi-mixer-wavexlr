@@ -129,4 +129,4 @@ async function initialize() {
   console.log(mixerMap)
 }
 
-initialize()
+initialize().then(() => console.log("started!"))
