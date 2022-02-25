@@ -535,17 +535,17 @@ class WaveLinkClient {
     }
   }
 
-  setFilter(mixerID, filterID) {
+  setFilter(mixerID, filterID, enabled = null) {
     this.mixers.forEach((mixer) => {
       if (mixer.mixerId == mixerID) {
         const filter = mixer.filters.find((f) => f.filterID == filterID)
-        filter.active = !filter.active
+        filter.active = enabled ?? !filter.active
         this.setInputMixer(mixer.mixerId, mixer.topSlider)
       }
     })
   }
 
-  setFilterBypass(mixerID, slider) {
+  setFilterBypass(mixerID, slider, enabled = null) {
     const mixer = this.getMixer(mixerID)
 
     if (slider == "all") {
@@ -553,9 +553,9 @@ class WaveLinkClient {
         mixer.localMixFilterBypass = mixer.streamMixFilterBypass = !mixer.localMixFilterBypass
       else mixer.localMixFilterBypass = mixer.streamMixFilterBypass = true
     } else if (slider == "local")
-      mixer.localMixFilterBypass = !mixer.localMixFilterBypass
+      mixer.localMixFilterBypass = enabled ?? !mixer.localMixFilterBypass
     else if (slider == "stream")
-      mixer.streamMixFilterBypass = !mixer.streamMixFilterBypass
+      mixer.streamMixFilterBypass = enabled ?? !mixer.streamMixFilterBypass
 
     this.setInputMixer(mixer.mixerId, slider)
   }

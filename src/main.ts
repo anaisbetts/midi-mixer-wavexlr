@@ -107,6 +107,21 @@ async function initialize() {
     $MM.showNotification(`Couldn't connect to Wave Link software! ${e}`)
   }
 
+  // Set up toggle buttons
+  const createButton = (
+    id: string,
+    data: ButtonTypeData,
+    pressed: (b: ButtonType) => unknown
+  ) => {
+    const btn = new ButtonType(id, data)
+    btn.on("pressed", () => pressed(btn))
+    buttonList[id] = btn
+  }
+
+  //
+  // Set up fader assignments
+  //
+
   mixerMap = (await client.getMixers()).reduce(
     (
       acc: Record<string, { mixer: Mixer; assignment: Assignment }>,
@@ -144,9 +159,6 @@ async function initialize() {
           assign.volume = level
         })
 
-        // TODO: Update assign.volume when the mixer volume changes
-        // TODO: Update mute when the mixer mute changes
-
         assign.on("mutePressed", () => {
           client.setMute("input", mixer.mixId, type)
           assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
@@ -155,12 +167,27 @@ async function initialize() {
         acc[name] = { mixer, assignment: assign }
       })
 
+      mixer.filters.forEach((f) => {
+        createButton(
+          `${mixer.mixId}_${f.filterID}`,
+          {
+            name: `${f.name} on ${mixer.mixerName}`,
+            active: f.active,
+          },
+          (b) => {
+            client.setFilter(mixer.mixId, f.filterID)
+            f.active = b.active
+          }
+        )
+      })
+
       return acc
     },
     {}
   )
 
-  // Monitor mixer level changes and update the faders
+  // Monitor mixer level changes from Wave Link and update the faders
+  //
   // deviceId example: pcm_out_01_v_00_sd2
   // mixerId examples: pcm_out_01_v_00_sd2_local, pcm_out_01_v_00_sd2_stream
   client.event!.on("inputMixerChanged", (deviceId: string) => {
@@ -173,18 +200,16 @@ async function initialize() {
     localMixer.assignment.volume = volumeWaveLinkToMM(mixer.localVolIn)
     streamMixer.assignment.muted = mixer.isStreamMuteIn
     streamMixer.assignment.volume = volumeWaveLinkToMM(mixer.streamVolIn)
+
+    // Update filter buttons
+    mixer.filters.forEach((f) => {
+      buttonList[`${deviceId}_${f.filterID}`].active = f.active
+    })
   })
 
-  // Set up toggle buttons
-  const createButton = (
-    id: string,
-    data: ButtonTypeData,
-    pressed: (b: ButtonType) => unknown
-  ) => {
-    const btn = new ButtonType(id, data)
-    btn.on("pressed", () => pressed(btn))
-    buttonList[id] = btn
-  }
+  //
+  // Set up Buttons
+  //
 
   createButton(
     "toggleMonitorState",
