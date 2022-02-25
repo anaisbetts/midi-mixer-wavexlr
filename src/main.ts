@@ -106,6 +106,8 @@ async function initialize() {
           assign.volume = level
         })
 
+        client.setFilterBypass()
+
         assign.on("mutePressed", () => {
           client.setMute("input", mixer.mixId, type)
           assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
@@ -124,7 +126,3 @@ async function initialize() {
 }
 
 initialize()
-
-setInterval(() => {
-  console.log("hi")
-}, 10000)
