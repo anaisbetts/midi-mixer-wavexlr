@@ -110,8 +110,6 @@ async function initialize() {
           assign.volume = level
         })
 
-        client.setFilterBypass()
-
         assign.on("mutePressed", () => {
           client.setMute("input", mixer.mixId, type)
           assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
@@ -130,3 +128,8 @@ async function initialize() {
 }
 
 initialize().then(() => console.log("started!"))
+
+// NB: Without this, Midi Mixer immediately terminates 
+setInterval(() => {
+  console.log("")
+}, 1 * 60 * 60 * 1000)
