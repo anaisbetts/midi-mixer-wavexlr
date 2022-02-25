@@ -26,7 +26,11 @@ class WaveLinkClient {
 
     this.event = ELGEvents.eventEmitter()
     this.on = this.event.on
-    this.emit = this.event.emit
+    //this.emit = this.event.emit
+    this.emit = (...args) => {
+      console.log("emit", ...args)
+      this.event.emit(...args)
+    }
 
     this.awl = new AppWaveLink()
     this.rpc = new simple_jsonrpc()
