@@ -4,7 +4,7 @@ This plugin allows you, along with MIDI Mixer, to control your Wave Link app via
 
 ## What can I control with this?
 
-* Set both Headphone / Stream channel volume in Wave Link
+* Set both Headphone / Stream volume in Wave Link for all channels
 * Toggle Monitor / Stream in headphones
 * Toggle VST Filters
 
