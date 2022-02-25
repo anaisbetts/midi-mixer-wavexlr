@@ -1,6 +1,12 @@
 # MIDI Mixer + Wave Link
 
-This plugin allows you, along with MIDI Mixer, to control your Wave Link app via MIDI. Currently supports faders only.
+This plugin allows you, along with MIDI Mixer, to control your Wave Link app via MIDI.
+
+## What can I control with this?
+
+* Set both Headphone / Stream channel volume in Wave Link
+* Toggle Monitor / Stream in headphones
+* Toggle VST Filters
 
 ## How do I use this??
 
