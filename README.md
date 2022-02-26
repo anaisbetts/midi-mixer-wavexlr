@@ -1,6 +1,6 @@
-# MIDI Mixer + Wave Link
+# [MIDI Mixer](https://www.midi-mixer.com/) + Wave Link
 
-This plugin allows you, along with MIDI Mixer, to control your Wave Link app via MIDI.
+This plugin allows you, along with [MIDI Mixer](https://www.midi-mixer.com/), to control your Wave Link app via MIDI.
 
 ## What can I control with this?
 
