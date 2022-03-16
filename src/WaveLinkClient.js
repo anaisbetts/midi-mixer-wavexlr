@@ -627,30 +627,6 @@ class WaveLinkClient {
       if (result || result == undefined) {
         if (result["appName"] == "Elgato Wave Link") {
           debug("Wave Link WebSocketServer found.")
-
-          var versionNumber = result["version"]
-
-          if (
-            /*versionNumber.includes("(") && */ this.minimumBuild <=
-            parseInt(versionNumber.match(/\((.*)\)/).pop())
-          ) {
-            debug("Minimum WL version or above found.")
-            this.getMicrophoneState()
-            this.getMicrophoneSettings()
-            this.getMonitorMixOutputList()
-            this.getSwitchState()
-            this.getMonitoringState()
-            this.getMixers()
-            this.isConnected = true
-            this.isWLUpToDate = true
-            return true
-          } else {
-            debug("Please update WL-Version")
-            this.isConnected = true
-            this.isWLUpToDate = false
-            this.awl.updatePI()
-            return Promise.reject(new Error("Please update WL-Version"))
-          }
         } else {
           debug("Wrong WebSocketServer found.")
           return Promise.reject(new Error("Wrong WebSocketServer found."))
