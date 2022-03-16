@@ -17,7 +17,6 @@ class WaveLinkClient {
     this.UP_MAC = system == "mac" ? true : false
     this.UP_WINDOWS = system == "windows" ? true : false
 
-    this.minimumBuild = this.UP_WINDOWS ? 2601 : 2785
     this.isWLUpToDate = false
 
     this.appIsRunning = false
@@ -204,26 +203,22 @@ class WaveLinkClient {
             mixer.bgColor = bgColor
             mixer.localVolIn = localVolumeIn
             mixer.streamVolIn = streamVolumeIn
-            mixer.isLinked = isLinked
-            mixer.deltaLinked = deltaLinked
 
             mixer.isLocalMuteIn = isLocalInMuted
             mixer.isStreamMuteIn = isStreamInMuted
 
             mixer.isAvailable = isAvailable
 
-            mixer.filters = filters
+            if (mixer.filters != filters) {
+              mixer.filters = filters
+              this.awl.updatePI()
+            }
             mixer.localMixFilterBypass = localMixFilterBypass
             mixer.streamMixFilterBypass = streamMixFilterBypass
 
             mixer.iconData = iconData
             mixer.inputType = inputType
 
-            if (mixer.deltaLinked > 0) {
-              mixer.topSlider = "local"
-            } else if (mixer.deltaLinked < 0) {
-              mixer.topSlider = "stream"
-            }
             this.mixerVolChanged(mixerId)
           }
         })
@@ -390,8 +385,6 @@ class WaveLinkClient {
     // init vars based on the mixertyp
     var localVol,
       streamVol,
-      deltaLinked,
-      isLinked,
       slider = inSlider
 
     if (mixerTyp == "input") {
@@ -399,8 +392,6 @@ class WaveLinkClient {
         if (mixer.mixerId == mixerId) {
           localVol = mixer.localVolIn
           streamVol = mixer.streamVolIn
-          deltaLinked = mixer.deltaLinked
-          isLinked = mixer.isLinked
         }
       })
     } else if (mixerTyp == "output") {
@@ -411,34 +402,10 @@ class WaveLinkClient {
     // adjust volume based on inputtyp
     if (slider == "local" && !isLinked) {
       localVol = localVol + vol
-    } else if (slider == "stream" && !isLinked) {
+    } else if (slider == "stream") {
       streamVol = streamVol + vol
-    } else if (isLinked) {
-      const topSlider = deltaLinked > 0 ? "stream" : "local"
-
-      switch (vol > 0) {
-        case true:
-          if (topSlider == "local") {
-            localVol = localVol + vol
-            slider = "local"
-          } else if (topSlider == "stream") {
-            streamVol = streamVol + vol
-            slider = "stream"
-          }
-          break
-        case false:
-          if (topSlider == "local") {
-            streamVol = streamVol + vol
-            slider = "stream"
-          } else if (topSlider == "stream") {
-            localVol = localVol + vol
-            slider = "local"
-          }
-          break
-        default:
-          break
-      }
     }
+
     // adjust volume based on the mixertyp
     if (mixerTyp == "input") {
       this.mixers.forEach((mixer) => {
@@ -771,8 +738,6 @@ class WaveLinkClient {
           inputType: e.inputType,
           localVolIn: e.localVolumeIn,
           streamVolIn: e.streamVolumeIn,
-          isLinked: e.isLinked,
-          deltaLinked: e.deltaLinked,
           isLocalMuteIn: e.isLocalInMuted,
           isStreamMuteIn: e.isStreamInMuted,
           isAvailable: e.isAvailable,
