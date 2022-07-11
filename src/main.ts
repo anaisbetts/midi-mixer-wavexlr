@@ -194,10 +194,12 @@ async function initialize() {
     {}
   )
 
+  var outputVolume = await client.getMonitoringState();
+  
   // // Create slider for monitor output
   // // Maybe we should try to get the data first?
-  var monitor_mixer_volume = client.output ? client.output.localVolOut : 100
-  var monitor_mixer_muted = client.output ? client.output.isLocalMuteOut : false
+  var monitor_mixer_volume = outputVolume.localVolOut
+  var monitor_mixer_muted = outputVolume.isLocalMuteOut
   const monitor_mixer = new Assignment("wavelink_monitor_mix_volume", {
     name: `Monitor Mix Volume`,
     muted: monitor_mixer_muted,
@@ -223,11 +225,11 @@ async function initialize() {
   })
 
   // Add slider for stream mix output volume
-  var stream_mixer_volume = client.output ? client.output.streamVolOut : 100
-  var stream_mixer_muted = client.output ? client.output.isStreamMuteOut : false
+  var stream_mixer_volume = outputVolume.streamVolOut
+  var stream_mixer_muted = outputVolume.isStreamMuteOut
 
   const stream_mixer = new Assignment("wavelink_stream_mix_volume", {
-    name: `stream Mix Volume`,
+    name: `Stream Mix Volume`,
     muted: stream_mixer_muted,
     volume: volumeWaveLinkToMM(stream_mixer_volume),
   })
