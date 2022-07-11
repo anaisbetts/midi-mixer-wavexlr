@@ -230,6 +230,7 @@ class WaveLinkClient {
 
     this.rpc.on("channelsChanged", ["channels"], (channels) => {
       this.setChannels(channels)
+      this.emit("channelsChanged")
     })
 
     return this.getApplicationInfo()
