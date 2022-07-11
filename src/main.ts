@@ -173,17 +173,6 @@ async function initialize() {
         })
 
         acc[name] = { mixer, assignment: assign }
-
-        createButton(
-          `${name}_link_sliders`,
-          {
-            name: `Link volume sliders on ${mixer.mixerName}`,
-            active: false
-          },
-          (b) => {
-            
-          }
-        )
       })
 
       mixer.filters.forEach((f) => {
