@@ -423,6 +423,18 @@ class WaveLinkClient {
     }
   }
 
+  setOutputVolume(slider, targetVol, muted) {
+    if (slider == "local") {
+      this.output.localVolOut = targetVol
+      this.output.isLocalMuteOut = undefined !== muted ? muted : false
+    } else {
+      this.output.streamVolOut = targetVol
+      this.output.isStreamMuteOut = undefined !== muted ? muted : false
+    }
+
+    return this.setOutputMixer()
+  }
+
   setVolume(mixerTyp, mixerId, slider, targetVol, delay) {
     var timeLeft = delay
     var volumeSteps = 0,

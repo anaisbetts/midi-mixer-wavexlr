@@ -255,6 +255,75 @@ async function initialize() {
 
   console.log(`Found ${Object.keys(mixerMap).length} mixers`)
   console.log(mixerMap)
+
+  // Volume sliders for output mix
+  // Get current output volumes
+  var outputVolume = await client.getMonitoringState();
+  
+  // // Create slider for monitor output
+  var monitor_mixer_volume = outputVolume.localVolOut
+  var monitor_mixer_muted = outputVolume.isLocalMuteOut
+  const monitor_mixer = new Assignment("wavelink_monitor_mix_volume", {
+    name: `Monitor Mix Volume`,
+    muted: monitor_mixer_muted,
+    volume: volumeWaveLinkToMM(monitor_mixer_volume),
+  })
+
+  // Guess we need to "set it harder" (?)
+  setTimeout(() => {
+    monitor_mixer.volume = volumeWaveLinkToMM(monitor_mixer_volume)
+    monitor_mixer.muted = monitor_mixer_muted
+  }, 100)
+
+  monitor_mixer.on("volumeChanged", (level: number) => {
+    client.setOutputVolume(
+      "local",
+      volumeMMToWaveLink(level)
+    )
+  })
+
+  monitor_mixer.on("mutePressed", () => {
+    client.setMute("output", null, "local")
+    monitor_mixer.muted = client.output?.isLocalMuteOut
+  })
+
+  // Add slider for stream mix output volume
+  var stream_mixer_volume = outputVolume.streamVolOut
+  var stream_mixer_muted = outputVolume.isStreamMuteOut
+
+  const stream_mixer = new Assignment("wavelink_stream_mix_volume", {
+    name: `Stream Mix Volume`,
+    muted: stream_mixer_muted,
+    volume: volumeWaveLinkToMM(stream_mixer_volume),
+  })
+
+  // Guess we need to "set it harder" (?)
+  setTimeout(() => {
+    stream_mixer.volume = volumeWaveLinkToMM(stream_mixer_volume)
+    stream_mixer.muted = stream_mixer_muted
+  }, 100)
+
+  stream_mixer.on("volumeChanged", (level: number) => {
+    client.setOutputVolume(
+      "stream",
+      volumeMMToWaveLink(level)
+    )
+  })
+
+  stream_mixer.on("mutePressed", () => {
+    client.setMute("output", null, "stream")
+    stream_mixer.muted = client.output?.isStreamMuteOut
+  })
+
+  client.event!.on("outputMixerChanged", () => {
+    if (client.output)
+    {
+      monitor_mixer.volume = volumeWaveLinkToMM(client.output.localVolOut)
+      monitor_mixer.muted = client.output.isLocalMuteOut
+      stream_mixer.volume = volumeWaveLinkToMM(client.output.streamVolOut)
+      stream_mixer.muted = client.output.isStreamMuteOut
+    }
+  })
 }
 
 initialize().then(() => console.log("started!"))
