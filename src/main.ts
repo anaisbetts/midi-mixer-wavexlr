@@ -118,6 +118,58 @@ async function initialize() {
     buttonList[id] = btn
   }
 
+  const createMixerAssignment = ( mixer: Mixer, type: string) =>
+  {
+    const name = `${mixer.mixId}_${type}`
+    const friendlyType = type === "local" ? "Headphone" : "Stream"
+    const isLocal = type === "local"
+
+    const [muted, volume] = isLocal
+      ? [mixer.isLocalInMuted, mixer.localVolumeIn]
+      : [mixer.isStreamInMuted, mixer.streamVolumeIn]
+
+    const assign = new Assignment(name, {
+      name: `${mixer.mixerName} - ${friendlyType}`,
+      muted,
+      volume: volumeWaveLinkToMM(volume),
+    })
+
+    // Set volume even harder
+    setTimeout(() => {
+      assign.volume = volumeWaveLinkToMM(volume)
+    }, 100)
+
+    assign.on("volumeChanged", (level: number) => {
+      client.setVolume(
+        "input",
+        mixer.mixId,
+        type,
+        volumeMMToWaveLink(level)
+      )
+      assign.volume = level
+    })
+
+    assign.on("mutePressed", () => {
+      client.setMute("input", mixer.mixId, type)
+      assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
+    })
+
+    return {id: name, assignment: assign}
+  }
+
+  const createFilterButton = (mixer: Mixer, f: Filter) => {
+    createButton(
+      `${mixer.mixId}_${f.filterID}`,
+      {
+        name: `${f.name} on ${mixer.mixerName}`,
+        active: f.active,
+      },
+      (b) => {
+        client.setFilter(mixer.mixId, f.filterID)
+        f.active = b.active
+      }
+    )
+  }
   //
   // Set up fader assignments
   //
@@ -130,55 +182,12 @@ async function initialize() {
       // For each mixer, we create a fader for both the headphone and stream
       // output
       mixerTypes.forEach((type) => {
-        const name = `${mixer.mixId}_${type}`
-        const friendlyType = type === "local" ? "Headphone" : "Stream"
-        const isLocal = type === "local"
-
-        const [muted, volume] = isLocal
-          ? [mixer.isLocalInMuted, mixer.localVolumeIn]
-          : [mixer.isStreamInMuted, mixer.streamVolumeIn]
-
-        const assign = new Assignment(name, {
-          name: `${mixer.mixerName} - ${friendlyType}`,
-          muted,
-          volume: volumeWaveLinkToMM(volume),
-        })
-
-        // Set volume even harder
-        setTimeout(() => {
-          assign.volume = volumeWaveLinkToMM(volume)
-        }, 100)
-
-        assign.on("volumeChanged", (level: number) => {
-          client.setVolume(
-            "input",
-            mixer.mixId,
-            type,
-            volumeMMToWaveLink(level)
-          )
-          assign.volume = level
-        })
-
-        assign.on("mutePressed", () => {
-          client.setMute("input", mixer.mixId, type)
-          assign.muted = isLocal ? mixer.isLocalInMuted : mixer.isStreamInMuted
-        })
-
-        acc[name] = { mixer, assignment: assign }
+        var assign = createMixerAssignment(mixer, type)
+        acc[assign.id] = { mixer, assignment: assign.assignment }
       })
 
       mixer.filters.forEach((f) => {
-        createButton(
-          `${mixer.mixId}_${f.filterID}`,
-          {
-            name: `${f.name} on ${mixer.mixerName}`,
-            active: f.active,
-          },
-          (b) => {
-            client.setFilter(mixer.mixId, f.filterID)
-            f.active = b.active
-          }
-        )
+        createFilterButton(mixer, f)
       })
 
       return acc
@@ -225,6 +234,38 @@ async function initialize() {
       b.active = newState === "StreamMix"
     }
   )
+
+  // Channel is added or deleted
+  client.event!.on("channelsChanged", async () => {
+    // Removing all assignments
+    var mixerNames = Object.keys(mixerMap)
+    mixerNames.forEach( (mixerName) => {
+      mixerMap[mixerName].assignment.remove();
+    })
+
+    // Adding all assignments
+    mixerMap = (await client.getMixers()).reduce(
+      (
+        acc: Record<string, { mixer: Mixer; assignment: Assignment }>,
+        mixer: Mixer
+      ) => {
+        // For each mixer, we create a fader for both the headphone and stream
+        // output
+        mixerTypes.forEach((type) => {
+          var assign = createMixerAssignment(mixer, type)
+          acc[assign.id] = { mixer, assignment: assign.assignment }
+        })
+  
+        mixer.filters.forEach((f) => {
+          createFilterButton(mixer, f)
+        })
+  
+        return acc
+      },
+      {}
+    )
+
+  });
 
   console.log(`Found ${Object.keys(mixerMap).length} mixers`)
   console.log(mixerMap)
