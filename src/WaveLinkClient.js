@@ -36,7 +36,7 @@ class WaveLinkClient {
 
     this.websocket = null
 
-    this.output = null
+    this.output = {}
     this.mixers = []
 
     this.isMicrophoneConnected
@@ -203,6 +203,8 @@ class WaveLinkClient {
             mixer.bgColor = bgColor
             mixer.localVolIn = localVolumeIn
             mixer.streamVolIn = streamVolumeIn
+            mixer.isLinked = isLinked
+            mixer.deltaLinked = deltaLinked
 
             mixer.isLocalMuteIn = isLocalInMuted
             mixer.isStreamMuteIn = isStreamInMuted
@@ -218,6 +220,8 @@ class WaveLinkClient {
 
             mixer.iconData = iconData
             mixer.inputType = inputType
+
+            console.log('From change', mixer)
 
             this.mixerVolChanged(mixerId)
           }
@@ -400,7 +404,7 @@ class WaveLinkClient {
     }
 
     // adjust volume based on inputtyp
-    if (slider == "local" && !isLinked) {
+    if (slider == "local") {
       localVol = localVol + vol
     } else if (slider == "stream") {
       streamVol = streamVol + vol
@@ -422,6 +426,22 @@ class WaveLinkClient {
     }
   }
 
+  setOutputVolume(slider, targetVol, muted)
+  {
+    if (slider == "local")
+    {
+      this.output.localVolOut = targetVol
+      this.output.isLocalMuteOut = (undefined !== muted) ? muted : false
+    } else
+    {
+      this.output.streamVolOut = targetVol
+      this.output.isStreamMuteOut = (undefined !== muted) ? muted : false
+
+    }
+
+    return this.setOutputMixer()
+  }
+
   setVolume(mixerTyp, mixerId, slider, targetVol, delay) {
     var timeLeft = delay
     var volumeSteps = 0,
@@ -431,7 +451,7 @@ class WaveLinkClient {
 
     const mixer = this.getMixer(mixerId)
 
-    var isNotBlocked =
+    isNotBlocked =
       mixerTyp == "input"
         ? slider == "local"
           ? mixer.isNotBlockedLocal

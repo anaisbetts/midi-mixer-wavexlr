@@ -165,6 +165,17 @@ async function initialize() {
         })
 
         acc[name] = { mixer, assignment: assign }
+
+        createButton(
+          `${name}_link_sliders`,
+          {
+            name: `Link volume sliders on ${mixer.mixerName}`,
+            active: false
+          },
+          (b) => {
+            
+          }
+        )
       })
 
       mixer.filters.forEach((f) => {
@@ -185,6 +196,86 @@ async function initialize() {
     },
     {}
   )
+
+  // // Create slider for monitor output
+  // // Maybe we should try to get the data first?
+  var monitor_mixer_volume = client.output ? client.output.localVolOut : 100
+  var monitor_mixer_muted = client.output ? client.output.isLocalMuteOut : false
+  const monitor_mixer = new Assignment("wavelink_monitor_mix_volume", {
+    name: `Monitor Mix Volume`,
+    muted: monitor_mixer_muted,
+    volume: volumeWaveLinkToMM(monitor_mixer_volume),
+  })
+
+  // Guess we need to "set it harder" (?)
+  setTimeout(() => {
+    monitor_mixer.volume = volumeWaveLinkToMM(monitor_mixer_volume)
+    monitor_mixer.muted = monitor_mixer_muted
+  }, 100)
+
+  monitor_mixer.on("volumeChanged", (level: number) => {
+    client.setOutputVolume(
+      "local",
+      volumeMMToWaveLink(level)
+    )
+  })
+
+  monitor_mixer.on("mutePressed", () => {
+    client.setMute("output", null, "local")
+    monitor_mixer.muted = client.output?.isLocalMuteOut
+  })
+
+  // Add slider for stream mix output volume
+  var stream_mixer_volume = client.output ? client.output.streamVolOut : 100
+  var stream_mixer_muted = client.output ? client.output.isStreamMuteOut : false
+
+  const stream_mixer = new Assignment("wavelink_stream_mix_volume", {
+    name: `stream Mix Volume`,
+    muted: stream_mixer_muted,
+    volume: volumeWaveLinkToMM(stream_mixer_volume),
+  })
+
+  // Guess we need to "set it harder" (?)
+  setTimeout(() => {
+    stream_mixer.volume = volumeWaveLinkToMM(stream_mixer_volume)
+    stream_mixer.muted = stream_mixer_muted
+  }, 100)
+
+  stream_mixer.on("volumeChanged", (level: number) => {
+    client.setOutputVolume(
+      "stream",
+      volumeMMToWaveLink(level)
+    )
+  })
+
+  stream_mixer.on("mutePressed", () => {
+    client.setMute("output", null, "stream")
+    stream_mixer.muted = client.output?.isStreamMuteOut
+  })
+
+  client.event!.on("outputMixerChanged", () => {
+    if (client.output)
+    {
+      monitor_mixer.volume = volumeWaveLinkToMM(client.output.localVolOut)
+      monitor_mixer.muted = client.output.isLocalMuteOut
+      stream_mixer.volume = volumeWaveLinkToMM(client.output.streamVolOut)
+      stream_mixer.muted = client.output.isStreamMuteOut
+    }
+  })
+
+  // // Set volume even harder
+  // setTimeout(() => {
+  //   assign.volume = volumeWaveLinkToMM(100)
+  // }, 100)
+
+  // assign.on("volumeChanged", (level: number) => {
+    
+  //   assign.volume = level
+  // })
+
+  // assign.on("mutePressed", () => {
+  // })
+
 
   // Monitor mixer level changes from Wave Link and update the faders
   //
@@ -225,6 +316,7 @@ async function initialize() {
       b.active = newState === "StreamMix"
     }
   )
+
 
   console.log(`Found ${Object.keys(mixerMap).length} mixers`)
   console.log(mixerMap)
