@@ -199,6 +199,7 @@ class WaveLinkClient {
       ) => {
         this.mixers.forEach((mixer) => {
           if (mixer.mixerId == mixerId) {
+            console.log(mixer);
             mixer.name = mixerName
             mixer.bgColor = bgColor
             mixer.localVolIn = localVolumeIn
@@ -220,8 +221,6 @@ class WaveLinkClient {
 
             mixer.iconData = iconData
             mixer.inputType = inputType
-
-            console.log('From change', mixer)
 
             this.mixerVolChanged(mixerId)
           }

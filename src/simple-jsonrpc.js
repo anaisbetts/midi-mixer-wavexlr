@@ -215,7 +215,7 @@ export const simple_jsonrpc = function () {
       waitingframe[result.id].resolve(result.result)
       delete waitingframe[result.id]
     } else {
-      console.log("unknown request", result)
+      console.log("unknown request", JSON.stringify(result))
     }
   }
 
@@ -237,7 +237,6 @@ export const simple_jsonrpc = function () {
               request.params
             )
           } else if (isObject(request.params)) {
-            // console.log("handleRemoteRequest.params", dispatcher[request.method]);
             if (dispatcher[request.method].params instanceof Array) {
               var argsValues = []
               dispatcher[request.method].params.forEach(function (arg) {

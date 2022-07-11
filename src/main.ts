@@ -70,15 +70,13 @@ async function connectWithRetry(client: WaveLinkClient) {
   while (retries > 0) {
     try {
       await client.tryToConnect()
-      return false
+      return true
     } catch (e) {
       client.reconnect()
       retries--
-
       if (retries < 0) throw e
     }
   }
-
   return false
 }
 
@@ -94,7 +92,11 @@ const mixerTypes = ["local", "stream"]
 let mixerMap: Record<string, { mixer: Mixer; assignment: Assignment }>
 const buttonList: Record<string, ButtonType> = {}
 
+let maxConnectRetries = 10;
+let connectRetries = 0;
+
 async function initialize() {
+  console.log('Trying to connect');
   const client = new WaveLinkClient("windows")
 
   // Leak client for debugging
@@ -102,9 +104,15 @@ async function initialize() {
   wnd.waveLinkClient = client
 
   try {
-    await connectWithRetry(client)
+    let connectSuccess = await connectWithRetry(client)
+    if (!connectSuccess && connectRetries < maxConnectRetries)
+    {
+      console.log('Retrying in 1 minute')
+      setTimeout(initialize, 60000)
+      return
+    }
   } catch (e) {
-    $MM.showNotification(`Couldn't connect to Wave Link software! ${e}`)
+      $MM.showNotification(`Couldn't connect to Wave Link software! ${e}`)
   }
 
   // Set up toggle buttons
