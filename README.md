@@ -4,9 +4,9 @@ This plugin allows you, along with [MIDI Mixer](https://www.midi-mixer.com/), to
 
 ## What can I control with this?
 
-* Set both Headphone / Stream volume in Wave Link for all channels
-* Toggle Monitor / Stream in headphones
-* Toggle VST Filters
+- Set both Headphone / Stream volume in Wave Link for all channels
+- Toggle Monitor / Stream in headphones
+- Toggle VST Filters
 
 ## How do I use this??
 
@@ -27,7 +27,7 @@ Initial setup:
 
 ```sh
 cmd
-mklink /D C:\Path\to\this\checkout %AppData%/MIDI Mixer/plugins/wave-xlr
+mklink /D C:\Path\to\this\checkout %AppData%/midi-mixer-app/plugins/wave-xlr
 ```
 
 To build:
