@@ -91,7 +91,10 @@ function volumeWaveLinkToMM(vol: number) {
 }
 
 const mixerTypes = ["local", "stream"]
-let mixerMap: Record<string, { mixer: Mixer; assignment: Assignment }>
+let mixerMap: Record<
+  string,
+  { mixer: Mixer | undefined; assignment: Assignment }
+>
 const buttonList: Record<string, ButtonType> = {}
 
 function createMixerAssignment(
@@ -255,6 +258,62 @@ async function initialize() {
 
   console.log(`Found ${Object.keys(mixerMap).length} mixers`)
   console.log(mixerMap)
+
+  // Volume sliders for output mix
+  // Get current output volumes
+  const outputVolume = await client.getMonitoringState()
+
+  // Set up sliders for final headphone and stream output
+  const localAndStream = [true, false]
+
+  localAndStream.forEach((isLocal) => {
+    // Create slider for monitor output
+    const mixerVolume = isLocal
+      ? outputVolume.localVolOut
+      : outputVolume.streamVolOut
+
+    const mixerMuted = isLocal
+      ? outputVolume.isLocalMuteOut
+      : outputVolume.isStreamMuteOut
+
+    const mixer = new Assignment(
+      `wavelink_monitor_${isLocal ? "local" : "stream"}_volume`,
+      {
+        name: isLocal ? `Monitor Mix Volume` : `Stream Mix Volume`,
+        muted: mixerMuted,
+        volume: volumeWaveLinkToMM(mixerVolume),
+      }
+    )
+
+    // Set volume even harder
+    setTimeout(() => {
+      mixer.volume = volumeWaveLinkToMM(mixerVolume)
+      mixer.muted = mixerMuted
+    }, 100)
+
+    const volType = isLocal ? "local" : "stream"
+    mixer.on("volumeChanged", (level: number) => {
+      client.setOutputVolume(volType, volumeMMToWaveLink(level))
+    })
+
+    mixer.on("mutePressed", () => {
+      client.setMute("output", null, volType)
+      mixer.muted = client.output!.isLocalMuteOut
+    })
+
+    client.event!.on("outputMixerChanged", () => {
+      if (client.output) {
+        mixer.volume = volumeWaveLinkToMM(
+          isLocal ? client.output.localVolOut : client.output.streamVolOut
+        )
+        mixer.muted = isLocal
+          ? client.output.isLocalMuteOut
+          : client.output.isStreamMuteOut
+      }
+    })
+
+    mixerMap[mixer.id] = { mixer: undefined, assignment: mixer }
+  })
 }
 
 initialize().then(() => console.log("started!"))
