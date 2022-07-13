@@ -27,7 +27,7 @@ Initial setup:
 
 ```sh
 cmd
-mklink /D C:\Path\to\this\checkout %AppData%/midi-mixer-app/plugins/wave-xlr
+mklink /D %AppData%/midi-mixer-app/plugins/midi-mixer-wave-xlr C:\Path\to\this\checkout
 ```
 
 To build:
