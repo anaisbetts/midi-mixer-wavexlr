@@ -1,6 +1,6 @@
 {
   "name": "midi-mixer-wave-xlr",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "description": "A MIDI Mixer plugin for the Wave Link (Wave XLR and Wave:3)",
   "scripts": {
     "build": "git clean -xdf dist && tsc && midi-mixer pack"
@@ -16,7 +16,7 @@
     "package.json"
   ],
   "dependencies": {
-    "midi-mixer-plugin": "^0.4.0",
+    "midi-mixer-plugin": "^1.0.2",
     "ws": "^8.4.2"
   },
   "bundledDependencies": [
