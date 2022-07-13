@@ -91,7 +91,10 @@ function volumeWaveLinkToMM(vol: number) {
 }
 
 const mixerTypes = ["local", "stream"]
-let mixerMap: Record<string, { mixer: Mixer; assignment: Assignment }>
+let mixerMap: Record<
+  string,
+  { mixer: Mixer | undefined; assignment: Assignment }
+>
 const buttonList: Record<string, ButtonType> = {}
 
 function createMixerAssignment(
@@ -258,71 +261,58 @@ async function initialize() {
 
   // Volume sliders for output mix
   // Get current output volumes
-  var outputVolume = await client.getMonitoringState();
-  
-  // // Create slider for monitor output
-  var monitor_mixer_volume = outputVolume.localVolOut
-  var monitor_mixer_muted = outputVolume.isLocalMuteOut
-  const monitor_mixer = new Assignment("wavelink_monitor_mix_volume", {
-    name: `Monitor Mix Volume`,
-    muted: monitor_mixer_muted,
-    volume: volumeWaveLinkToMM(monitor_mixer_volume),
-  })
+  const outputVolume = await client.getMonitoringState()
 
-  // Guess we need to "set it harder" (?)
-  setTimeout(() => {
-    monitor_mixer.volume = volumeWaveLinkToMM(monitor_mixer_volume)
-    monitor_mixer.muted = monitor_mixer_muted
-  }, 100)
+  // Set up sliders for final headphone and stream output
+  const localAndStream = [true, false]
 
-  monitor_mixer.on("volumeChanged", (level: number) => {
-    client.setOutputVolume(
-      "local",
-      volumeMMToWaveLink(level)
+  localAndStream.forEach((isLocal) => {
+    // Create slider for monitor output
+    const mixerVolume = isLocal
+      ? outputVolume.localVolOut
+      : outputVolume.streamVolOut
+
+    const mixerMuted = isLocal
+      ? outputVolume.isLocalMuteOut
+      : outputVolume.isStreamMuteOut
+
+    const mixer = new Assignment(
+      `wavelink_monitor_${isLocal ? "local" : "stream"}_volume`,
+      {
+        name: isLocal ? `Monitor Mix Volume` : `Stream Mix Volume`,
+        muted: mixerMuted,
+        volume: volumeWaveLinkToMM(mixerVolume),
+      }
     )
-  })
 
-  monitor_mixer.on("mutePressed", () => {
-    client.setMute("output", null, "local")
-    monitor_mixer.muted = client.output?.isLocalMuteOut
-  })
+    // Set volume even harder
+    setTimeout(() => {
+      mixer.volume = volumeWaveLinkToMM(mixerVolume)
+      mixer.muted = mixerMuted
+    }, 100)
 
-  // Add slider for stream mix output volume
-  var stream_mixer_volume = outputVolume.streamVolOut
-  var stream_mixer_muted = outputVolume.isStreamMuteOut
+    const volType = isLocal ? "local" : "stream"
+    mixer.on("volumeChanged", (level: number) => {
+      client.setOutputVolume(volType, volumeMMToWaveLink(level))
+    })
 
-  const stream_mixer = new Assignment("wavelink_stream_mix_volume", {
-    name: `Stream Mix Volume`,
-    muted: stream_mixer_muted,
-    volume: volumeWaveLinkToMM(stream_mixer_volume),
-  })
+    mixer.on("mutePressed", () => {
+      client.setMute("output", null, volType)
+      mixer.muted = client.output!.isLocalMuteOut
+    })
 
-  // Guess we need to "set it harder" (?)
-  setTimeout(() => {
-    stream_mixer.volume = volumeWaveLinkToMM(stream_mixer_volume)
-    stream_mixer.muted = stream_mixer_muted
-  }, 100)
+    client.event!.on("outputMixerChanged", () => {
+      if (client.output) {
+        mixer.volume = volumeWaveLinkToMM(
+          isLocal ? client.output.localVolOut : client.output.streamVolOut
+        )
+        mixer.muted = isLocal
+          ? client.output.isLocalMuteOut
+          : client.output.isStreamMuteOut
+      }
+    })
 
-  stream_mixer.on("volumeChanged", (level: number) => {
-    client.setOutputVolume(
-      "stream",
-      volumeMMToWaveLink(level)
-    )
-  })
-
-  stream_mixer.on("mutePressed", () => {
-    client.setMute("output", null, "stream")
-    stream_mixer.muted = client.output?.isStreamMuteOut
-  })
-
-  client.event!.on("outputMixerChanged", () => {
-    if (client.output)
-    {
-      monitor_mixer.volume = volumeWaveLinkToMM(client.output.localVolOut)
-      monitor_mixer.muted = client.output.isLocalMuteOut
-      stream_mixer.volume = volumeWaveLinkToMM(client.output.streamVolOut)
-      stream_mixer.muted = client.output.isStreamMuteOut
-    }
+    mixerMap[mixer.id] = { mixer: undefined, assignment: mixer }
   })
 }
 
