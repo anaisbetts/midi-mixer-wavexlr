@@ -13,6 +13,10 @@ This plugin allows you, along with [MIDI Mixer](https://www.midi-mixer.com/), to
 
 Go to the Releases on the sidebar and download the latest release, then double-click it. MIDI Mixer will install it, and you can activate it in the Plugins section of the app.
 
+## I need help!
+
+Join the [MIDI Mixer Discord](https://discord.midi-mixer.com) and head over to #plugins
+
 ## For Developers:
 
 ### To build
