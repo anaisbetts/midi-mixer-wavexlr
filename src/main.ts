@@ -62,20 +62,30 @@ export interface FilterFromEvent {
   pluginID: string
 }
 
-async function connectWithRetry(client: WaveLinkClient) {
-  // NB: Every retry we move forward one port, 21 retries will
-  // cycle the entire list twice
-  let retries = 21
+export function delay(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
 
-  while (retries > 0) {
+async function connectWithRetry(client: WaveLinkClient) {
+  // NB: Every retry we move forward one port with a total
+  // of 10 possibilities
+  let retries = 4 * 10
+
+  while (retries >= 0) {
     try {
       await client.tryToConnect()
-      return false
+      return true
     } catch (e) {
       client.reconnect()
-      retries--
 
+      retries--
       if (retries < 0) throw e
+
+      // NB: If we have cycled through all ports, give it a longer delay;
+      // if not, just give it a jittered pause
+      await delay(retries % 10 == 0 ? 30 * 1000 : Math.random() * 250)
     }
   }
 
