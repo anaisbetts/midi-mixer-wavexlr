@@ -7,6 +7,7 @@ This plugin allows you, along with [MIDI Mixer](https://www.midi-mixer.com/), to
 - Set both Headphone / Stream volume in Wave Link for all channels
 - Toggle Monitor / Stream in headphones
 - Toggle VST Filters
+- Control Stream / Monitor Mix output volume
 
 ## How do I use this??
 
